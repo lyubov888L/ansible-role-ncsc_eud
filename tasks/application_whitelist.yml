@@ -1,0 +1,26 @@
+---
+- name: application_whitelist | Packages
+  become: true
+  package:
+    name:
+      - apparmor
+      - apparmor-notify
+      - apparmor-utils
+
+- name: application_whitelist | Find Existing AppArmor Policies
+  become: true
+  find:
+    file_type: file
+    paths:
+      - /etc/apparmor.d
+    recurse: false
+  register: _policy_files
+
+- name: Facts
+  set_fact:
+    _policies: "{{ _policy_files.files | default([]) | map(attribute='path') | list | intersect( ncsc_eud_apparmor_enforce_profiles ) }}"
+
+- name: application_whitelist | AppArmor Policies
+  become: true
+  command: /usr/sbin/aa-enforce {{ item }}
+  loop: "{{ _policies }}"

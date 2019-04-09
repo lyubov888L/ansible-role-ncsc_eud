@@ -1,0 +1,19 @@
+---
+ncsc_edu_packages_remove:
+  - popularity-contest
+
+# This should go in vault
+ncsc_eud_grub_password: "password"
+
+ncsc_eud_default_home_dir_mode: "0700"
+ncsc_eud_default_user_shell: /usr/sbin/nologin
+ncsc_eud_default_user_umask: "077"
+
+ncsc_eud_apparmor_enforce_profiles:
+  - /etc/apparmor.d/usr.bin.firefox
+  - /etc/apparmor.d/usr.sbin.avahi-daemon
+  - /etc/apparmor.d/usr.sbin.dnsmasq
+  - /etc/apparmor.d/bin.ping
+  - /etc/apparmor.d/usr.sbin.rsyslogd
+
+ncsc_eud_gnome_screensaver_idle_secs: 300

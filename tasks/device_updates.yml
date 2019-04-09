@@ -1,0 +1,30 @@
+---
+- name: device_updates | Auto Update packages
+  become: true
+  package:
+    name:
+      - update-notifier-common
+      - unattended-upgrades
+    state: present
+
+- name: device_updates | Configure Unattended Upgrade
+  become: true
+  copy:
+    content: |
+      {{ ansible_managed | comment('//') }}
+      APT::Periodic::Update-Package-Lists "1";
+      APT::Periodic::Unattended-Upgrade "1";
+    dest: /etc/apt/apt.conf.d/20auto-upgrade
+    group: root
+    mode: "u=rw,go=r"
+    owner: root
+
+- name: device_updates | Configure Auto Clean Interval
+  become: true
+  lineinfile:
+    path: /etc/apt/apt.conf.d/10periodic
+    regex: '^APT::Periodic::AutocleanInterval'
+    line: 'APT::Periodic::AutocleanInterval "7";'
+    group: root
+    mode: "u=rw,go=r"
+    owner: root

@@ -1,0 +1,21 @@
+---
+galaxy_info:
+  author: Brett Delle Grazie
+  description: Role that configures NCSC End User Device Guidelines for Ubuntu
+
+  license: GPLv3
+
+  min_ansible_version: 2.7
+
+  platforms:
+    - name: Ubuntu
+      versions:
+        - '18.04'
+
+  galaxy_tags:
+    - ncsc
+    - hardenening
+    - eud
+    - ubuntu
+
+dependencies: []

@@ -1,0 +1,8 @@
+---
+ncsc_eud_packages_blacklist:
+  - popularity-contest
+
+ncsc_eud_platform_integrity_packages:
+  - apparmor-profiles
+  - apparmor-utils
+  - auditd

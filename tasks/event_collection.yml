@@ -1,0 +1,111 @@
+---
+- name: event_collection | Packages
+  become: true
+  apt:
+    name: auditd
+    state: present
+  environment:
+    RUNLEVEL: 1
+
+- name: event_collection | Audit temporary files
+  become: true
+  copy:
+    dest: /etc/audit/rules.d/tmp-monitor.rules
+    content: |
+      {{ ansible_managed | comment }}
+      # Monitor changes and executions within /tmp
+      -w /tmp/ -p wa -k tmp_write
+      -w /tmp/ -p x -k tmp_exec
+    group: root
+    mode: "u=rw,g=r,o="
+    owner: root
+  notify:
+    - Generate audit rules
+    - Restart Auditd
+
+- name: event_collection | Audit Home dir access by administrator
+  become: true
+  copy:
+    dest: /etc/audit/rules.d/admin-home-watch.rules
+    content: |
+      {{ ansible_managed | comment }}
+      # Monitor administrator access to /home directories
+      -a always,exit -F dir=/home/ -F uid=0 -C auid!=obj_uid -k admin_home_user
+    group: root
+    mode: "u=rw,g=r,o="
+    owner: root
+  notify:
+    - Generate audit rules
+    - Restart Auditd
+
+- name: event_collection | Auditd Service
+  become: true
+  systemd:
+    name: auditd
+    state: started
+
+- name: event_collection | Disable Error Reporting Services (1)
+  become: true
+  systemd:
+    name: "{{ item }}"
+    state: stopped
+    masked: true
+    enabled: false
+  loop:
+    - apport.service
+    - whoopsie.service
+
+- name: event_collection | Disable Error Reporting Services (2)
+  become: true
+  lineinfile:
+    path: "{{ item }}"
+    create: true
+    regexp: '^enabled='
+    line: 'enabled=0'
+    state: present
+    group: root
+    mode: "u=rw,go=r"
+    owner: root
+  loop:
+    - /etc/default/apport
+    - /etc/default/whoopsie
+
+- name: event_collection |DConf System Configuration Dir
+  become: true
+  file:
+    path: /etc/dconf/db/local.d/locks
+    state: directory
+    mode: "u=rwx,go=rx"
+    owner: root
+    group: root
+
+- name: event_collection |Disable Crash Notifier
+  become: true
+  copy:
+    dest: /etc/dconf/db/local.d/00_update-notifier-lock
+    content: |
+      {{ ansible_managed | comment }}
+      [com/ubuntu/update-notifier]
+      show-apport-crashes=false
+    owner: root
+    group: root
+    mode: "u=rw,go=r"
+  notify: dconf update
+
+- name: event_collection | Lock Crash Notifier
+  become: true
+  copy:
+    dest: /etc/dconf/db/local.d/locks/00_update-notifier-lock
+    content: |
+      /com/ubuntu/update-notifier/show-apport-crashes
+    owner: root
+    group: root
+    mode: "u=rw,go=r"
+  notify: dconf update
+
+- name: event_collection | Limit Writeable Crash dirs
+  become: true
+  command: /usr/bin/dpkg-statoverride --update --add root whoopsie 03775 {{ item }}
+  loop:
+    - /var/crash
+    - /var/metrics

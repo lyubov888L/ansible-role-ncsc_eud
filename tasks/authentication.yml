@@ -1,0 +1,45 @@
+---
+- name: authentication | Default Home Directory DIR_MODE
+  become: true
+  lineinfile:
+    path: /etc/adduser.conf
+    regexp: "^DIR_MODE="
+    line: 'DIR_MODE={{ ncsc_eud_default_home_dir_mode }}'
+    state: present
+    group: root
+    mode: "u=rw,go=r"
+    owner: root
+
+- name: authentication | Default SHELL for new users (adduser)
+  become: true
+  lineinfile:
+    path: /etc/adduser.conf
+    regexp: '^DSHELL='
+    line: 'DSHELL={{ ncsc_eud_default_user_shell }}'
+    state: present
+    group: root
+    mode: "u=rw,go=r"
+    owner: root
+
+- name: authentication | Default SHELL for new users (useradd)
+  become: true
+  lineinfile:
+    path: /etc/default/useradd
+    regexp: '^SHELL='
+    line: 'SHELL={{ ncsc_eud_default_user_shell }}'
+    state: present
+    group: root
+    mode: "u=rw,go=r"
+    owner: root
+
+- name: authentication | Default UMASK for new users
+  become: true
+  lineinfile:
+    path: /etc/login.defs
+    backrefs: true
+    regexp: 'UMASK(\s+)(?:\d+)'
+    line: 'UMASK\1{{ ncsc_eud_default_user_umask }}'
+    state: present
+    group: root
+    mode: "u=rw,go=r"
+    owner: root

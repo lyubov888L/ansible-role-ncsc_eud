@@ -1,0 +1,76 @@
+---
+- name: platform_integrity | Install
+  become: true
+  package:
+    name: "{{ ncsc_eud_platform_integrity_packages }}"
+    state: present
+
+- name: platform_integrity | Mount facts
+  set_fact:
+    _home_mount: "{{ ansible_facts['mounts'] | selectattr('mount', 'eq', '/home') | first | default({}) }}"
+    _tmp_mount: "{{  ansible_facts['mounts'] | selectattr('mount', 'eq', '/tmp') | first | default({}) }}"
+    _run_shm_mount: "{{  ansible_facts['mounts'] | selectattr('mount', 'eq', '/run/shm') | first | default({}) }}"
+    _var_tmp_mount: "{{  ansible_facts['mounts'] | selectattr('mount', 'eq', '/var/tmp') | first | default({}) }}"
+
+- name: platform_integrity | /home Mount Point
+  become: true
+  mount:
+    backup: true
+    boot: true
+    fstype: "{{ _home_mount['fstype'] }}"
+    opts: "{{ _home_mount['options'].split(',') | union(['nodev','noexec','nosuid']) | sort | unique | join(',') }}"
+    path: /home
+    passno: 2
+    src: "{{ ('UUID=' ~ _home_mount['uuid']) if _home_mount['uuid'] is defined else _home_mount['device'] }}"
+    state: mounted
+  when: _home_mount is not empty
+
+- name: platform_integrity | /tmp Mount Point
+  become: true
+  mount:
+    backup: true
+    boot: true
+    fstype: "{{ _tmp_mount['fstype'] }}"
+    opts: "{{ _tmp_mount['options'] | union([nodev','noexec','nosuid']) | sort | unique | join(',') }}"
+    path: /tmp
+    passno: "{{ 0 if _tmp_mount['fstype'] == 'tmpfs' else 2 }}"
+    src: "{{ (_tmp_mount['fstype'] == 'tmpfs') | ternary('none', ('UUID=' ~ _tmp_mount['uuid']) if _tmp_mount['uuid'] is defined else _tmp_mount['device'] ) }}"
+    state: mounted
+  when: _tmp_mount is not empty
+
+- name: platform_integrity | /run/shm Mount Point
+  become: true
+  mount:
+    backup: true
+    boot: true
+    fstype: "tmpfs"
+    opts: "rw,nodev,noexec,nosuid"
+    path: /run/shm
+    src: "none"
+    state: mounted
+  when: _run_shm is not empty
+
+- name: platform_integrity | /var/tmp Mount Point
+  become: true
+  mount:
+    backup: true
+    boot: true
+    fstype: "none"
+    opts: "bind"
+    path: /var/tmp
+    src: "/tmp"
+    state: mounted
+  when: _var_tmp is not empty
+
+- name: platform_integrity | Mount /tmp exec during updates
+  become: true
+  copy:
+    content: |
+      {{ ansible_managed | comment('//') }}
+      DPkg::Pre-Invoke{"mount -o remount,exec /tmp";};
+      DPkg::Post-Invoke {"mount -o remount /tmp";};
+    dest: /etc/apt/apt.conf.d/99tmpexec
+    force: true
+    group: root
+    mode: "u=rw,go=r"
+    owner: root

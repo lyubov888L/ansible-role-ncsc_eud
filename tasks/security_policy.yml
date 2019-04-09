@@ -1,0 +1,90 @@
+---
+- name: security_policy | Packages
+  become: true
+  package:
+    name: libpam-pwquality
+
+- name: security_policy | Find Home directories
+  become: true
+  find:
+    recurse: false
+    file_type: directory
+    paths:
+      - /home
+  register: _home_dirs
+
+- debug:
+    var: _home_dirs
+
+- name: security_policy | Home Directory Permissions
+  become: true
+  file:
+    path: "{{ item }}"
+    mode: "u=rwx,go="
+  loop: "{{ _home_dirs.files | map(attribute='path') | list }}"
+  when: _home_dirs is succeeded
+
+- name: security_policy | Check /bin/su state
+  become: true
+  command: /usr/bin/dpkg-statoverride --list /bin/su
+  register: _bin_su
+  failed_when: _bin_su.rc == 2
+
+- name: security_policy | Limit SU binary execution to root:adm
+  become: true
+  command: /usr/bin/dpkg-statoverride --update --add root adm 4750 /bin/su
+  when: _bin_su.rc == 1
+
+- name: security_policy | DConf System Configuration Dir
+  become: true
+  file:
+    path: /etc/dconf/db/local.d/locks
+    state: directory
+    mode: "u=rwx,go=rx"
+    owner: root
+    group: root
+
+- name: security_policy | Gnome Screen-Saver Settings
+  become: true
+  copy:
+    dest: /etc/dconf/db/local.d/00_screensaver-lock
+    content: |
+      {{ ansible_managed | comment }}
+      [org/gnome/desktop/session]
+      idle-delay={{ ncsc_eud_gnome_screensaver_idle_secs }}
+      [org/gnome/desktop/screensaver]
+      lock-enabled=1
+      lock-delay=0
+    owner: root
+    group: root
+    mode: "u=rw,go=r"
+  notify: dconf update
+
+- name: security_policy | Gnome Screen Saver Lock
+  become: true
+  copy:
+    dest: /etc/dconf/db/local.d/locks/00_screensaver-lock
+    content: |
+      /org/gnome/desktop/session/idle-delay
+      /org/gnome/desktop/screensaver/lock-enabled
+      /org/gnome/desktop/screensaver/lock-delay
+    owner: root
+    group: root
+    mode: "u=rw,go=r"
+  notify: dconf update
+
+- name: security_policy | DConf User Profile
+  become: true
+  copy:
+    dest: /etc/dconf/profile/user
+    content:
+      user-db:user
+      system-db:local
+    owner: root
+    group: root
+    mode: "u=rw,go=r"
+  notify: dconf update
+
+- name: security_policy | Enable firewall
+  become: true
+  command: /usr/sbin/ufw enable

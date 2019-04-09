@@ -1,0 +1,77 @@
+---
+- name: secure_boot | Packages
+  become: true
+  package:
+    name:
+      - python3-pbkdf2
+    state: present
+
+- name: secure_boot | Grub password
+  become: true
+  copy:
+    dest: /etc/grub.d/40_custom
+    content: |
+      #!/bin/sh
+      {{ ansible_managed | comment }}
+      exec tail -n +3 $0
+      # This file provides an easy way to add custom menu entries.  Simply type the
+      # menu entries you want to add after this comment.  Be careful not to change
+      # the 'exec tail' line above.
+      set superusers="root"
+      password_pbkdf2 root {{ ncsc_eud_grub_password | password_hash('grub_pbkdf2_sha512', 65534 | random(seed=inventory_hostname) | string) }}
+    group: root
+    mode: "u=rwx,go=rx"
+    owner: root
+  notify: Update Grub
+
+- name: secure_boot | Grub unrestricted ($title)
+  become: true
+  lineinfile:
+    backrefs: true
+    line: '\1echo "menuentry --unrestricted \2'
+    path: /etc/grub.d/10_linux
+    regexp: '^(\s+)echo "menuentry (?:--unrestricted )?(.*\$title.*)$'
+    state: present
+    group: root
+    mode: "u=rwx,go=rx"
+    owner: root
+  notify: Update Grub
+
+- name: secure_boot | Grub unrestricted ($os)
+  become: true
+  lineinfile:
+    backrefs: true
+    line: '\1echo "menuentry --unrestricted \2'
+    path: /etc/grub.d/10_linux
+    regexp: '^(\s+)echo "menuentry (?:--unrestricted )?(.*\$os.*)$'
+    state: present
+    group: root
+    mode: "u=rwx,go=rx"
+    owner: root
+  notify: Update Grub
+
+- name: secure_boot | Grub Kernel Param module.sig_enforce=yes
+  become: true
+  lineinfile:
+    backrefs: true
+    line: 'GRUB_CMDLINE_LINUX_DEFAULT="\1 module.sig_enforce=yes\2"'
+    path: /etc/default/grub
+    regexp: '^GRUB_CMDLINE_LINUX_DEFAULT="(.*?)(?: module.sig_enforce=yes)?(.*?)"$'
+    state: present
+    group: root
+    mode: "u=rw,go=r"
+    owner: root
+  notify: Update Grub
+
+- name: secure_boot | Grub Disable Save Default
+  become: true
+  lineinfile:
+    backrefs: true
+    line: 'GRUB_SAVEDEFAULT=false'
+    path: /etc/default/grub
+    regexp: '^#?GRUB_SAVEDEFAULT='
+    state: present
+    group: root
+    mode: "u=rw,go=r"
+    owner: root
+  notify: Update Grub

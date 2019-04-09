@@ -1,0 +1,18 @@
+---
+- name: Update Grub
+  become: true
+  command: /usr/sbin/update-grub
+
+- name: Generate audit rules
+  become: true
+  command: /sbin/augenrules
+
+- name: Restart Auditd
+  become: true
+  systemd:
+    service: auditd
+    state: restarted
+
+- name: dconf update
+  become: true
+  command: /usr/bin/dconf update

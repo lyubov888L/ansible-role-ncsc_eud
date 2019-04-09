@@ -1,0 +1,23 @@
+---
+- include: authentication.yml
+  tags: authentication
+- include: secure_boot.yml
+  tags: secure_boot
+- include: tpm.yml
+  tags: tpm
+#- include: platform_integrity.yml
+#  tags: platform_integrity
+#- include: application_whitelist.yml
+#  tags: application_whitelist
+#- include: malicious_code_detection.yml
+#  tags: malicious_code_detection
+#- include: security_policy.yml
+#  tags: security_policy
+#- include: external_interface_protection.yml
+#  tags: external_interface_protection
+#- include: device_updates.yml
+#  tags: device_updates
+#- include: event_collection.yml
+#  tags: event_collection
+#- include: incident_response.yml
+#  tags: incident_response
