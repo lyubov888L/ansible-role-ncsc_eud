@@ -1,0 +1,51 @@
+---
+package:
+  libpam-pwquality:
+    installed: true
+files:
+  /home/vagrant:
+    exists: true
+    filetype: directory
+    owner: vagrant
+    group: vagrant
+    mode: '0700'
+  /bin/su:
+    exists: true
+    owner: root
+    group: root
+    mode: '0750'
+  /etc/dconf/db/local.d/locks:
+    exists: true
+    filetype: directory
+    owner: root
+    group: root
+    mode: '0755'
+  /etc/dconf/db/local.d/00_screensaver-lock:
+    exists: true
+    filetype: file
+    owner: root
+    group: root
+    mode: '0644'
+    contains:
+      - 'idle-delay=300'
+      - 'lock-enabled=1'
+      - 'lock-delay=0'
+  /etc/dconf/db/local.d/locks/00_screensaver-lock:
+    exists: true
+    filetype: file
+    owner: root
+    group: root
+    mode: '0644'
+    contains:
+      - '/org/gnome/desktop/session/idle-delay'
+      - '/org/gnome/desktop/screensaver/lock-enabled'
+      - '/org/gnome/desktop/screensaver/lock-delay'
+  /etc/dconf/profile/user:
+    exists: true
+    filetype: file
+    owner: root
+    group: root
+    mode: '0644'
+    contains:
+      - 'user-db:user'
+      - 'system-db:local'
