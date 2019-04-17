@@ -1,0 +1,25 @@
+---
+file:
+  /etc/grub.d/40_custom:
+    exists: true
+    owner: root
+    group: root
+    mode: '0755'
+    contains:
+      - '/^password_pbkdf2 root/'
+  /etc/grub.d/10_linux:
+    exists: true
+    owner: root
+    group: root
+    mode: '0755'
+    contains:
+      - '/menuentry --unrestricted .*\$title/'
+      - '/menuentry --unrestricted .*\$os/'
+  /etc/default/grub:
+    exists: true
+    owner: root
+    group: root
+    mode: '0644'
+    contains:
+      - '/^GRUB_CMDLINE_LINUX_DEFAULT=.*module.sig_enforce=yes/'
+      - '!/^GRUB_SAVEDEFAULT=false'
