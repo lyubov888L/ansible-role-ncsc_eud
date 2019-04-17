@@ -1,0 +1,6 @@
+---
+package:
+  tpm2-tools:
+    installed: true
+  tss2:
+    installed: true
