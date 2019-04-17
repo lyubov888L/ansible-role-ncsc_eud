@@ -1,0 +1,8 @@
+---
+package:
+  apparmor:
+    installed: true
+  apparmor-notify:
+    installed: true
+  apparmor-utils:
+    installed: true

@@ -7,8 +7,8 @@
   tags: tpm
 #- include: platform_integrity.yml
 #  tags: platform_integrity
-#- include: application_whitelist.yml
-#  tags: application_whitelist
+- include: application_whitelist.yml
+  tags: application_whitelist
 #- include: malicious_code_detection.yml
 #  tags: malicious_code_detection
 #- include: security_policy.yml
