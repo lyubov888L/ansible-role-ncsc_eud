@@ -37,8 +37,8 @@
   lineinfile:
     path: /etc/login.defs
     backrefs: true
-    regexp: 'UMASK(\s+)(?:\d+)'
-    line: 'UMASK\1{{ ncsc_eud_default_user_umask }}'
+    regexp: '^UMASK\s+\d+$'
+    line: 'UMASK           {{ ncsc_eud_default_user_umask | string }}'
     state: present
     group: root
     mode: "u=rw,go=r"

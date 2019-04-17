@@ -1,0 +1,24 @@
+---
+file:
+  /etc/adduser.conf:
+    exists: true
+    owner: root
+    group: root
+    mode: '0644'
+    contains:
+      - 'DIR_MODE=0700'
+      - 'DSHELL=/usr/sbin/nologin'
+  /etc/default/useradd:
+    exists: true
+    owner: root
+    group: root
+    mode: '0644'
+    contains:
+      - 'SHELL=/usr/sbin/nologin'
+  /etc/login.defs:
+    exists: true
+    owner: root
+    group: root
+    mode: '0644'
+    contains:
+      - '/UMASK\s+077/'
