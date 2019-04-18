@@ -11,7 +11,7 @@
   become: true
   copy:
     content: |
-      {{ ansible_managed | comment('//') }}
+      {{ ansible_managed | comment('c') }}
       APT::Periodic::Update-Package-Lists "1";
       APT::Periodic::Unattended-Upgrade "1";
     dest: /etc/apt/apt.conf.d/20auto-upgrade

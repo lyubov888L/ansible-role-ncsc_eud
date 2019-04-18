@@ -15,8 +15,8 @@
   tags: security_policy
 #- include: external_interface_protection.yml
 #  tags: external_interface_protection
-#- include: device_updates.yml
-#  tags: device_updates
+- include: device_updates.yml
+  tags: device_updates
 #- include: event_collection.yml
 #  tags: event_collection
 #- include: incident_response.yml

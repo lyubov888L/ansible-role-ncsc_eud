@@ -1,0 +1,22 @@
+---
+package:
+  unattended-upgrades:
+    installed: true
+files:
+  /etc/apt/apt.conf.d/20auto-upgrade:
+    exists: true
+    filetype: file
+    owner: root
+    group: root
+    mode: '0644'
+    contains:
+      - 'APT::Periodic::Update-Package-Lists "1";'
+      - 'APT::Periodic::Unattended-Upgrade "1";'
+  /etc/apt/apt.conf.d/10periodic:
+    exists: true
+    filetype: file
+    owner: root
+    group: root
+    mode: '0644'
+    contains:
+      - 'APT::Periodic::AutocleanInterval "7";'
