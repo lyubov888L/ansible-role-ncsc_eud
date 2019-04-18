@@ -85,6 +85,10 @@
     mode: "u=rw,go=r"
   notify: dconf update
 
+- name: security_policy | Enable SSH through Firewall
+  become: true
+  command: /usr/sbin/ufw allow OpenSSH
+
 - name: security_policy | Enable firewall
   become: true
-  command: /usr/sbin/ufw enable
+  command: /usr/sbin/ufw --force enable
