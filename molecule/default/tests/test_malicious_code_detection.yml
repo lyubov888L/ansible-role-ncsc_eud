@@ -1,0 +1,13 @@
+---
+package:
+  chkrootkit:
+    installed: true
+files:
+  /etc/chkrootkit.conf:
+    exists: true
+    filetype: file
+    owner: root
+    group: root
+    mode: '0644'
+    contains:
+      - 'RUN_DAILY=true'

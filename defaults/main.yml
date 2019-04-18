@@ -17,3 +17,5 @@ ncsc_eud_apparmor_enforce_profiles:
   - /etc/apparmor.d/usr.sbin.rsyslogd
 
 ncsc_eud_gnome_screensaver_idle_secs: 300
+
+ncsc_eud_daily_rootkit_scan: true

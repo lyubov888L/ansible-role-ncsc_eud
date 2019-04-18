@@ -1,1 +1,20 @@
 ---
+- name: Install malicious code detection packages
+  become: true
+  package:
+    name:
+      - chkrootkit
+      - clamav-daemon
+      - clamdscan
+
+- name: Daily rootkit scans
+  become: true
+  lineinfile:
+    line: "RUN_DAILY={{ ncsc_eud_daily_rootkit_scan | bool | lower }}"
+    group: root
+    owner: root
+    mode: "u=rw,go=r"
+    path: /etc/chkrootkit.conf
+    regexp: "^RUN_DAILY="
+
+#- name: Configure ClamAV for on-access scans
