@@ -21,3 +21,5 @@ repos:
         files: \.(yaml|yml)$
         exclude: molecule/default/tests/test_ca_certificates.yml
         always_run: true
+        args:
+          - '.'

@@ -1,4 +1,6 @@
 ---
+- include: pre_tasks.yml
+  tags: pre_tasks
 - include: authentication.yml
   tags: authentication
 - include: secure_boot.yml
