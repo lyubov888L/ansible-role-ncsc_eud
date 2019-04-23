@@ -1,6 +1,0 @@
----
-- name: pre_tasks | Packages to remove
-  become: true
-  package:
-    name: "{{ ncsc_eud_packages_blacklist }}"
-    state: absent

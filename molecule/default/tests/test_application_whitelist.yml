@@ -6,3 +6,12 @@ package:
     installed: true
   apparmor-utils:
     installed: true
+
+service:
+  apparmor.service:
+    enabled: true
+    running: true
+
+command:
+  /usr/bin/aa-enabled -q:
+    exit-status: 0
