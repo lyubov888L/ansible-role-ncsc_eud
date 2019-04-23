@@ -28,6 +28,7 @@
   become: true
   command: /usr/bin/dpkg-statoverride --list /bin/su
   register: _bin_su
+  changed_when: false
   failed_when: _bin_su.rc == 2
 
 - name: security_policy | Limit SU binary execution to root:adm
@@ -88,7 +89,11 @@
 - name: security_policy | Enable SSH through Firewall
   become: true
   command: /usr/sbin/ufw allow OpenSSH
+  tags:
+    - skip_ansible_lint
 
 - name: security_policy | Enable firewall
   become: true
   command: /usr/sbin/ufw --force enable
+  tags:
+    - skip_ansible_lint

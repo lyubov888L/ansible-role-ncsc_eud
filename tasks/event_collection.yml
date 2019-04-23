@@ -113,6 +113,7 @@
   become: true
   command: /usr/bin/dpkg-statoverride --list /var/crash
   register: _dir_override
+  changed_when: false
   failed_when: _dir_override.rc == 2
 
 - name: event_collection | Limit Writeable /var/crash
@@ -124,6 +125,7 @@
   become: true
   command: /usr/bin/dpkg-statoverride --list /var/metrics
   register: _dir_override
+  changed_when: false
   failed_when: _dir_override.rc == 2
 
 - name: event_collection | Limit Writeable /var/metrics

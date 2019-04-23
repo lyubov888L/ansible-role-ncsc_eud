@@ -18,8 +18,7 @@ repos:
     rev: v4.1.0
     hooks:
       - id: ansible-lint
-        files: \.(yaml|yml)$
-        exclude: molecule/default/tests/test_ca_certificates.yml
+        pass_filenames: false
         always_run: true
         args:
           - '.'

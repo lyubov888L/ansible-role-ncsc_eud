@@ -16,3 +16,9 @@
 - name: dconf update
   become: true
   command: /usr/bin/dconf update
+
+- name: Reload AppArmor Service
+  become: true
+  systemd:
+    name: apparmor
+    state: reloaded

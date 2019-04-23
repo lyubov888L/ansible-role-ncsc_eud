@@ -7,20 +7,36 @@
       - apparmor-notify
       - apparmor-utils
 
-- name: application_whitelist | Find Existing AppArmor Policies
+- name: application_whitelist | Find disabled AppArmor Policies
   become: true
   find:
-    file_type: file
+    file_type: link
     paths:
-      - /etc/apparmor.d
+      - /etc/apparmor.d/disable
     recurse: false
-  register: _policy_files
+  register: _disabled_policy_files
 
+# AppArmor policies are *enabled by default*
+# To disable a policy, symlink it: /etc/apparmor.d/disable/<symlink> to /etc/apparmor.d/<policy>
+# Enable the ones in our list that are disabled (but present)
 - name: Facts
   set_fact:
-    _policies: "{{ _policy_files.files | default([]) | map(attribute='path') | list | intersect( ncsc_eud_apparmor_enforce_profiles ) }}"
+    _policies: "{{ _disabled_policy_files.files | default([]) | map(attribute='lnk_source') | list | intersect( ncsc_eud_apparmor_enforce_profiles ) }}"
 
 - name: application_whitelist | AppArmor Policies
   become: true
   command: /usr/sbin/aa-enforce {{ item }}
   loop: "{{ _policies }}"
+  notify:
+    - Reload AppArmor Service
+  tags:
+    - skip_ansible_lint
+
+- name: application_whitelist | AppArmor Service
+  become: true
+  systemd:
+    name: apparmor
+    daemon_reload: true
+    enabled: true
+    masked: false
+    state: started
