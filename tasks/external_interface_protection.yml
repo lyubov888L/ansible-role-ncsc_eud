@@ -1,1 +1,7 @@
 ---
+- name: external_interface_protection | Blacklist Fireware
+  become: true
+  copy:
+    dest: /etc/modprobe.d/ncsc-blacklist.conf
+    content:
+      blacklist firewire-sbp2
