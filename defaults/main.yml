@@ -10,11 +10,11 @@ ncsc_eud_default_user_shell: /usr/sbin/nologin
 ncsc_eud_default_user_umask: '077'
 
 ncsc_eud_apparmor_enforce_profiles:
-  - /etc/apparmor.d/usr.bin.firefox
-  - /etc/apparmor.d/usr.sbin.avahi-daemon
-  - /etc/apparmor.d/usr.sbin.dnsmasq
-  - /etc/apparmor.d/bin.ping
-  - /etc/apparmor.d/usr.sbin.rsyslogd
+  - usr.bin.firefox
+  - usr.sbin.avahi-daemon
+  - usr.sbin.dnsmasq
+  - bin.ping
+  - usr.sbin.rsyslogd
 
 ncsc_eud_gnome_screensaver_idle_secs: 300
 

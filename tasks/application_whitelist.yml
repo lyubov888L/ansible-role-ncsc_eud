@@ -7,6 +7,9 @@
       - apparmor-notify
       - apparmor-utils
 
+# AppArmor policies are *enabled by default*
+# To disable a policy, symlink it: /etc/apparmor.d/disable/<symlink> to /etc/apparmor.d/<policy>
+# Enable the ones in our list that are disabled (but present)
 - name: application_whitelist | Find disabled AppArmor Policies
   become: true
   find:
@@ -14,19 +17,24 @@
     paths:
       - /etc/apparmor.d/disable
     recurse: false
-  register: _disabled_policy_files
+  register: _disabled_policies
 
-# AppArmor policies are *enabled by default*
-# To disable a policy, symlink it: /etc/apparmor.d/disable/<symlink> to /etc/apparmor.d/<policy>
-# Enable the ones in our list that are disabled (but present)
-- name: Facts
-  set_fact:
-    _policies: "{{ _disabled_policy_files.files | default([]) | map(attribute='lnk_source') | list | intersect( ncsc_eud_apparmor_enforce_profiles ) }}"
+# For each disabled policy get the symlink source
+- name: application_whitelist | Disabled sources
+  become: true
+  stat:
+    path: "{{ item }}"
+    get_checksum: false
+    get_md5: false
+    get_mime: false
+  register: _stats
+  loop: "{{ _disabled_policies.files | default([]) | map(attribute='path') | list }}"
 
+# intersect with the policies that we want to manage
 - name: application_whitelist | AppArmor Policies
   become: true
   command: /usr/sbin/aa-enforce {{ item }}
-  loop: "{{ _policies }}"
+  loop: "{{ _stats.results | default([]) | map(attribute='stat.lnk_source') | map('basename') | intersect( ncsc_eud_apparmor_enforce_profiles ) | list }}"
   notify:
     - Reload AppArmor Service
   tags:
