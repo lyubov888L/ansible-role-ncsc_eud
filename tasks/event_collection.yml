@@ -7,6 +7,12 @@
   environment:
     RUNLEVEL: 1
 
+- name: event_collection | Packages removed
+  become: true
+  package:
+    name: "{{ ncsc_edu_packages_remove }}"
+    state: absent
+
 - name: event_collection | Audit temporary files
   become: true
   copy:
@@ -70,7 +76,7 @@
     - /etc/default/apport
     - /etc/default/whoopsie
 
-- name: event_collection |DConf System Configuration Dir
+- name: event_collection | DConf System Configuration Dir
   become: true
   file:
     path: /etc/dconf/db/local.d/locks
@@ -79,7 +85,7 @@
     owner: root
     group: root
 
-- name: event_collection |Disable Crash Notifier
+- name: event_collection | Disable Crash Notifier
   become: true
   copy:
     dest: /etc/dconf/db/local.d/00_update-notifier-lock
@@ -103,9 +109,24 @@
     mode: "u=rw,go=r"
   notify: dconf update
 
-- name: event_collection | Limit Writeable Crash dirs
+- name: security_policy | Check /var/crash state
   become: true
-  command: /usr/bin/dpkg-statoverride --update --add root whoopsie 03775 {{ item }}
-  loop:
-    - /var/crash
-    - /var/metrics
+  command: /usr/bin/dpkg-statoverride --list /var/crash
+  register: _dir_override
+  failed_when: _dir_override.rc == 2
+
+- name: event_collection | Limit Writeable /var/crash
+  become: true
+  command: /usr/bin/dpkg-statoverride --update --add root whoopsie 03775 /var/crash
+  when: _dir_override.rc == 1
+
+- name: security_policy | Check /var/metrics state
+  become: true
+  command: /usr/bin/dpkg-statoverride --list /var/metrics
+  register: _dir_override
+  failed_when: _dir_override.rc == 2
+
+- name: event_collection | Limit Writeable /var/metrics
+  become: true
+  command: /usr/bin/dpkg-statoverride --update --add root whoopsie 03775 /var/metrics
+  when: _dir_override.rc == 1

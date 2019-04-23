@@ -1,0 +1,80 @@
+---
+package:
+  auditd:
+    installed: true
+  popularity-contest:
+    installed: false
+
+files:
+  /etc/audit/rules.d/tmp-monitor.rules:
+    exists: true
+    filetype: file
+    owner: root
+    group: root
+    mode: '0640'
+    contains:
+      - '-w /tmp/ -p wa -k tmp_write'
+      - '-w /tmp/ -p x -k tmp_exec'
+  /etc/audit/rules.d/admin-home-watch.rules:
+    exists: true
+    filetype: file
+    owner: root
+    group: root
+    mode: '0640'
+    contains:
+      - '-a always,exit -F dir=/home/ -F uid=0 -C auid!=obj_uid -k admin_home_user'
+  /etc/default/apport:
+    exists: true
+    filetype: file
+    owner: root
+    group: root
+    mode: '0644'
+    contains:
+      - 'enabled=0'
+  /etc/default/whoopsie:
+    exists: true
+    filetype: file
+    owner: root
+    group: root
+    mode: '0644'
+    contains:
+      - 'enabled=0'
+  /etc/dconf/db/local.d/00_update-notifier-lock:
+    exists: true
+    filetype: file
+    owner: root
+    group: root
+    mode: '0644'
+    contains:
+      - 'show-apport-crashes=false'
+  /etc/dconf/db/local.d/locks/00_update-notifier-lock:
+    exists: true
+    filetype: file
+    owner: root
+    group: root
+    mode: '0644'
+    contains:
+      - '/com/ubuntu/update-notifier/show-apport-crashes'
+  /var/crash:
+    exists: true
+    filetype: directory
+    owner: root
+    group: whoopsie
+    mode: '03775'
+  /var/metrics:
+    exists: true
+    filetype: directory
+    owner: root
+    group: whoopsie
+    mode: '03775'
+
+service:
+  auditd:
+    enabled: true
+    running: true
+  apport.service:
+    enabled: false
+    running: false
+  whoopsie.service:
+    enabled: false
+    running: false

@@ -17,7 +17,7 @@
 #  tags: external_interface_protection
 - include: device_updates.yml
   tags: device_updates
-#- include: event_collection.yml
-#  tags: event_collection
+- include: event_collection.yml
+  tags: event_collection
 #- include: incident_response.yml
 #  tags: incident_response
