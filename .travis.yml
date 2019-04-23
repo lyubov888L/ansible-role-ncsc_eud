@@ -28,7 +28,7 @@ install:
 
 script:
   # Run tests
-  - pipenv run pre-commit --all-files
+  - pipenv run pre-commit run --all-files
 
 notifications:
   webhooks: https://galaxy.ansible.com/api/v1/notifications/
