@@ -24,17 +24,9 @@
   loop: "{{ _home_dirs.files | map(attribute='path') | list }}"
   when: _home_dirs is succeeded
 
-- name: security_policy | Check /bin/su state
-  become: true
-  command: /usr/bin/dpkg-statoverride --list /bin/su
-  register: _bin_su
-  changed_when: false
-  failed_when: _bin_su.rc == 2
-
-- name: security_policy | Limit SU binary execution to root:adm
-  become: true
-  command: /usr/bin/dpkg-statoverride --update --add root adm 4750 /bin/su
-  when: _bin_su.rc == 1
+- name: security_policy | Execution Restrictions
+  include_tasks: security_policy_restrict_binaries.yml
+  loop: "{{ ncsc_eud_restricted_execs }}"
 
 - name: security_policy | DConf System Configuration Dir
   become: true

@@ -9,6 +9,13 @@ ncsc_eud_default_home_dir_mode: '0700'
 ncsc_eud_default_user_shell: /usr/sbin/nologin
 ncsc_eud_default_user_umask: '077'
 
+ncsc_eud_restricted_execs:
+  - /bin/su
+  - /usr/bin/gksu
+  - /usr/bin/gksudo
+  - /usr/bin/pkcon
+  - /usr/bin/pkexec
+
 ncsc_eud_apparmor_enforce_profiles:
   - usr.bin.firefox
   - usr.sbin.avahi-daemon

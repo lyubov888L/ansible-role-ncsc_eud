@@ -1,0 +1,12 @@
+---
+- name: security_policy | Check {{ item }} state
+  become: true
+  command: /usr/bin/dpkg-statoverride --list {{ item }}
+  register: _stat_override
+  changed_when: false
+  failed_when: _stat_override.rc == 2
+
+- name: security_policy | Limit {{ item }} binary execution to root:adm
+  become: true
+  command: /usr/bin/dpkg-statoverride --update --add root adm 4750 {{ item }}
+  when: _stat_override.rc == 1

@@ -12,7 +12,17 @@ files:
   /bin/su:
     exists: true
     owner: root
-    group: root
+    group: adm
+    mode: '0750'
+  /usr/bin/pkexec:
+    exists: true
+    owner: root
+    group: adm
+    mode: '0750'
+  /usr/bin/pkcon:
+    exists: true
+    owner: root
+    group: adm
     mode: '0750'
   /etc/dconf/db/local.d/locks:
     exists: true
